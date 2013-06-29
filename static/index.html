@@ -12,6 +12,7 @@
     <div data-role="panel" id="options">
       <label for="delay">Light Change Delay (seconds):</label>
       <input type="range" class="slider" name="delay" id="slider-delay" value="1" min="0.1" max="5" step=0.1 data-highlight="true"/>
+      <button data-icon="star" class="set" id="set-option">Set Lights</button>
       <a href="#options" data-role="button" data-icon="delete" data-rel="close">Close</a>
     </div>
 
@@ -19,7 +20,7 @@
       <p>
         <div data-role="fieldcontain">
           <a href="#options" data-role="button" data-inline="true" data-icon="bars">Menu</a>
-          <button data-icon="star" id="set" data-inline="true">Set Lights</button>
+          <button data-icon="star" class="set" id="set-quick" data-inline="true">Set Lights</button>
         </div>
       </p>
     </div>
@@ -43,27 +44,8 @@
       $("#dialog-text").html(text);
       $.mobile.changePage( "#dialog", { role: "dialog" } );
     }
-
-    $( "#main" ).on( "pageinit", function( event ) {
-      // Create sliders from config array below
-      var sliders = [ {name: "Test", channel: 3},
-                      {name: "Foo", channel: 4} ];
-      sliders = jQuery.map( sliders, function(i) {
-        return '<div data-role="fieldcontain">' +
-                  '<label for="slider-' + i.channel + '">' + i.name + '</label>' +
-                  '<input type="range" class="slider" name="' + i.channel + '" id="slider-' + i.channel + '" value="0" min="0" max="255" data-highlight="true"/>' +
-               '</div>';
-        });
-      $(".sliders").append(sliders).trigger("create");
-    });
-
-    $("#set").bind( "click", function(event, ui) {
-      // Grab info
-      var values = new Array();
-      $(".slider").each(function() {
-        values.push([this.name, this.value]);
-      });
-
+    
+    function set_lights(values) {
       // Send values as json blob
       $.ajax({
         url: "set_values", 
@@ -79,6 +61,28 @@
         .fail(function( jqxhr, textStatus, error ) {
           show_dialog( "Request Failed: " + textStatus + ", " + error );
         });
+    }
+
+    $( "#main" ).on( "pageinit", function( event ) {
+      // Create sliders from config array below
+      var sliders = [ {name: "Test", channel: 3},
+                      {name: "Foo", channel: 4} ];
+      sliders = jQuery.map( sliders, function(i) {
+        return '<div data-role="fieldcontain">' +
+                  '<label for="slider-' + i.channel + '">' + i.name + '</label>' +
+                  '<input type="range" class="slider" name="' + i.channel + '" id="slider-' + i.channel + '" value="0" min="0" max="255" data-highlight="true"/>' +
+               '</div>';
+        });
+      $(".sliders").append(sliders).trigger("create");
+    });
+
+    $(".set").bind( "click", function(event, ui) {
+      // Grab info
+      var values = new Array();
+      $(".slider").each(function() {
+        values.push([this.name, this.value]);
+      });
+      set_lights(values);
     });
   </script>
 
