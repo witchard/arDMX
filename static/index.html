@@ -26,17 +26,23 @@
       sliders = jQuery.map( sliders, function(i) {
         return '<div data-role="fieldcontain">' +
                   '<label for="slider-' + i.channel + '">' + i.name + '</label>' +
-                  '<input type="range" name="' + i.channel + '" id="slider-' + i.channel + '" value="0" min="0" max="255" data-highlight="true"/>' +
+                  '<input type="range" class="slider" name="' + i.channel + '" id="slider-' + i.channel + '" value="0" min="0" max="255" data-highlight="true"/>' +
                '</div>';
         });
       $(".sliders").append(sliders).trigger("create");
     });
 
     $("#set").bind( "click", function(event, ui) {
+      // Grab info
+      var values = new Array();
+      $(".slider").each(function() {
+        values.push([this.name, this.value]);
+      });
+
       // Send values as json blob
       $.ajax({
         url: "set_values", 
-        data: JSON.stringify({ name: "John", time: "2pm" }), 
+        data: JSON.stringify(values), 
         contentType: 'application/json',
         dataType: 'json',
         type: 'POST'})
