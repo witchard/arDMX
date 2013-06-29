@@ -8,17 +8,31 @@
     <script src="js/jquery.mobile-1.3.1.min.js"></script>
 </head>
 <body>
-  <div data-role="header" data-position="fixed">
-    <p>
-      <button data-icon="star" id="set">Set Lights</button>
-    </p>
-  </div>
+  <div data-role="page" id="main">
+    <div data-role="header" data-position="fixed">
+      <p>
+        <button data-icon="star" id="set">Set Lights</button>
+      </p>
+    </div>
 
-  <div class="sliders">
-    <!-- Empty space for our sliders -->
+    <div class="sliders">
+      <!-- Empty space for our sliders -->
+    </div>
+  </div>
+  <div data-role="page" id="dialog">
+    <div data-role="header">
+      <h1>Message</h1>
+    </div>    
+    <div data-role="content" id="dialog-text">
+    </div>    
   </div>
 
   <script>
+    function show_dialog(text) {
+      $("#dialog-text").html(text);
+      $.mobile.changePage( "#dialog", { role: "dialog" } );
+    }
+
     $(document).bind('pageinit', function() {
       // Create sliders from config array below
       var sliders = [ {name: "Test", channel: 3},
@@ -47,10 +61,12 @@
         dataType: 'json',
         type: 'POST'})
         .done(function( json ) {
-          alert( "JSON Data: " + JSON.stringify(json) );
+          if( !json.ok ) {
+            show_dialog( "Error: " + json.message );
+          }
         })
         .fail(function( jqxhr, textStatus, error ) {
-          alert( "Request Failed: " + textStatus + ", " + error );
+          show_dialog( "Request Failed: " + textStatus + ", " + error );
         });
     });
   </script>

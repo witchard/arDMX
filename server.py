@@ -17,7 +17,8 @@ class ReqHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
       self.data_string = self.rfile.read(int(self.headers['Content-Length']))
       req = json.loads(self.data_string)
       print req
-      resp = json.dumps( {'a': 5} )
+      #resp = json.dumps( {'ok': False, 'message': 'I hate poop'} )
+      resp = json.dumps( {'ok': True} )
       self.send_response(200)
       self.send_header("Content-Length", len(resp))
       self.send_header("Content-Type", "application/json")
