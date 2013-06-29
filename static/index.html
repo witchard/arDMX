@@ -33,7 +33,7 @@
       $.mobile.changePage( "#dialog", { role: "dialog" } );
     }
 
-    $(document).bind('pageinit', function() {
+    $( "#main" ).on( "pageinit", function( event ) {
       // Create sliders from config array below
       var sliders = [ {name: "Test", channel: 3},
                       {name: "Foo", channel: 4} ];
