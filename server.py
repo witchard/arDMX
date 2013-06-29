@@ -27,5 +27,5 @@ class ReqHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
     else:
       self.send_response(400) 
 
-httpd = BaseHTTPServer.HTTPServer(('localhost', 8000), ReqHandler)
+httpd = BaseHTTPServer.HTTPServer(('', 8000), ReqHandler)
 httpd.serve_forever()
