@@ -70,16 +70,16 @@
     }
 
     $( "#main" ).on( "pageinit", function( event ) {
-      // Create sliders from config array below
-      var sliders = [ {name: "Test", channel: 3},
-                      {name: "Foo", channel: 4} ];
-      sliders = jQuery.map( sliders, function(i) {
-        return '<div data-role="fieldcontain">' +
-                  '<label for="slider-' + i.channel + '">' + i.name + '</label>' +
-                  '<input type="range" class="slider" name="' + i.channel + '" id="slider-' + i.channel + '" value="0" min="0" max="255" data-highlight="true"/>' +
-               '</div>';
-        });
-      $(".sliders").append(sliders).trigger("create");
+      // Create sliders from config data on server
+      $.getJSON("config.json", function(sliders) {
+        sliders = jQuery.map( sliders, function(i) {
+          return '<div data-role="fieldcontain">' +
+                    '<label for="slider-' + i.channel + '">' + i.name + '</label>' +
+                    '<input type="range" class="slider" name="' + i.channel + '" id="slider-' + i.channel + '" value="0" min="0" max="255" data-highlight="true"/>' +
+                 '</div>';
+          });
+        $(".sliders").append(sliders).trigger("create");
+      });
     });
 
     $(".set").bind( "click", function(event, ui) {

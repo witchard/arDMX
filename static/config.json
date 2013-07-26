@@ -1,0 +1,4 @@
+[ {"name": "Test", "channel": 1},
+  {"name": "Foo", "channel": 2},
+  {"name": "Bar", "channel": 3},
+  {"name": "Baz", "channel": 4} ]
