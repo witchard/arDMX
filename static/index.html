@@ -11,7 +11,7 @@
   <div data-role="page" id="main">
     <div data-role="panel" id="options">
       <label for="delay">Light Change Delay (seconds):</label>
-      <input type="range" class="slider" name="delay" id="slider-delay" value="1" min="0.1" max="5" step=0.1 data-highlight="true"/>
+      <input type="range" name="delay" id="slider-delay" value="1" min="0.1" max="5" step=0.1 data-highlight="true"/>
       <button data-icon="star" class="set" id="set-option">Set Lights</button>
       <a href="#options" data-role="button" data-icon="delete" data-rel="close">Close</a>
     </div>
@@ -84,9 +84,9 @@
 
     $(".set").bind( "click", function(event, ui) {
       // Grab info
-      var values = new Array();
+      var values = {delay: $("#slider-delay").val(), lights: []};
       $(".slider").each(function() {
-        values.push([this.name, this.value]);
+        values.lights.push([this.name, this.value]);
       });
       set_lights(values);
     });
