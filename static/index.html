@@ -18,6 +18,9 @@
 
     <div data-role="header" data-position="fixed">
       <p>
+        <div data-role="popup" id="popupResult">
+          <p>Lights updated...</p>
+        </div>
         <div data-role="fieldcontain">
           <a href="#options" data-role="button" data-inline="true" data-icon="bars">Menu</a>
           <button data-icon="star" class="set" id="set-quick" data-inline="true">Set Lights</button>
@@ -56,6 +59,9 @@
         .done(function( json ) {
           if( !json.ok ) {
             show_dialog( "Error: " + json.message );
+          } else {
+            $("#popupResult").popup("open")
+            setTimeout(function () { $("#popupResult").popup("close"); }, 1000);
           }
         })
         .fail(function( jqxhr, textStatus, error ) {
