@@ -5,7 +5,6 @@ A DMX lighting controller. This project includes both a hardware element powered
 
 Todo
 ----
-* Live sending of lights values with on/off checkbox
 * Server actually connects to arduino and sets values
 * Support for select box light values as opposed to sliders
 * Server stores current light values which are restored by the page at load time

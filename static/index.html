@@ -13,15 +13,23 @@
       <!-- The delay will be implemented in js, but not yet! -->
       <label for="delay">Light Change Delay (seconds):</label>
       <input type="range" name="delay" id="slider-delay" value="0" min="0.1" max="5" step=0.1 disabled="disabled" data-highlight="true"/>
+      <label for="flip-live">Update Live:</label>
+      <select name="flip-live" id="flip-live" data-role="slider">
+        <option value="off">Off</option>
+        <option value="on">On</option>
+      </select>
       <button data-icon="star" class="set" id="set-option">Set Lights</button>
       <a href="#options" data-role="button" data-icon="delete" data-rel="close">Close</a>
     </div>
 
     <div data-role="header" data-position="fixed">
       <p>
+        <!-- Popup box to show the lights were updated -->
         <div data-role="popup" id="popupResult">
           <p>Lights updated...</p>
         </div>
+
+        <!-- Quick menu at top of screen -->
         <div data-role="fieldcontain">
           <a href="#options" data-role="button" data-inline="true" data-icon="bars">Menu</a>
           <button data-icon="star" class="set" id="set-quick" data-inline="true">Set Lights</button>
@@ -61,8 +69,8 @@
           if( !json.ok ) {
             show_dialog( "Error: " + json.message );
           } else {
-            $("#popupResult").popup("open")
-            setTimeout(function () { $("#popupResult").popup("close"); }, 1000);
+            //$("#popupResult").popup("open")
+            //setTimeout(function () { $("#popupResult").popup("close"); }, 1000);
           }
         })
         .fail(function( jqxhr, textStatus, error ) {
@@ -73,16 +81,23 @@
     $( "#main" ).on( "pageinit", function( event ) {
       // Create sliders from config data on server
       $.getJSON("config.json", function(sliders) {
+        // Map to generate an array of slider html goodness
         sliders = jQuery.map( sliders, function(i) {
           return '<div data-role="fieldcontain">' +
                     '<label for="slider-' + i.channel + '">' + i.name + '</label>' +
                     '<input type="range" class="slider" name="' + i.channel + '" id="slider-' + i.channel + '" value="' + i.initial + '" min="0" max="255" data-highlight="true"/>' +
                  '</div>';
           });
+        // Append them to our document
         $(".sliders").append(sliders).trigger("create");
+
+        // Setup sliders event handling
+        $(".slider").on("slidestart", slider_start);
+        $(".slider").on("slidestop", slider_stop);
       });
     });
 
+    // Handle set lights button click
     $(".set").bind( "click", function(event, ui) {
       // Grab info
       var values = {lights: []};
@@ -91,7 +106,51 @@
       });
       set_lights(values);
     });
+
+    // Handle live flips
+    $("#flip-live").on("slidestop", function(event, ui){
+      var on = event.currentTarget.selectedIndex;
+      if( on ) {
+        $(".set").button("disable");
+      } else {
+        $(".set").button("enable");
+      }
+    });
+
+    // Handle slider starting movements
+    var slider_timer = null;
+    var slider = null;
+    function slider_start(event) {
+      // Trigger updates every 100ms
+      if($("#flip-live")[0].selectedIndex) {
+        slider = event.currentTarget;
+        slider_timer = setTimeout(handle_slide, 100);
+      }
+    }
+
+    function handle_slide() {
+      // Update slider and trigger again
+      update_slider(slider);
+      slider_timer = setTimeout(handle_slide, 100);
+    }
+
+    function slider_stop(event) {
+      // Cancel triggering and update just to make sure we catch last value
+      if($("#flip-live")[0].selectedIndex) {
+        clearTimeout(slider_timer);
+        update_slider(event.currentTarget);
+      }
+    }
+
+    function update_slider(slider) {
+      // Post the new value
+      var values = {lights: []};
+      values.lights.push([slider.name, slider.value]);
+      set_lights(values);
+    } 
+
   </script>
 
 
 </body>
+</html>
