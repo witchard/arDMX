@@ -1,4 +1,8 @@
-[ {"channel": 1, "initial": 94 , "name": "Test"},
-  {"channel": 2, "initial": 1  , "name": "Foo"},
-  {"channel": 3, "initial": 212, "name": "Bar"},
-  {"channel": 4, "initial": 17 , "name": "Baz"} ]
+[
+  {"channel": 1, "initial": 191, "name": "Red"},
+  {"channel": 2, "initial": 0  , "name": "Green"},
+  {"channel": 3, "initial": 255, "name": "Blue"},
+  {"channel": 4, "initial": 0  , "name": "Amber"},
+  {"channel": 5, "initial": 0  , "name": "White"},
+  {"channel": 6, "initial": 128, "name": "Master"}
+]
