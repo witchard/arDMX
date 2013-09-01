@@ -2,12 +2,28 @@
 import BaseHTTPServer, SimpleHTTPServer
 import json
 import serial
+import sys
+import time
 
 # Connect to serial port
-ser = serial.Serial("/dev/ttyACM0", 9600, timeout=1)
+port_file = open("comport.txt", "r")
+ser = None
+for line in port_file.readlines():
+  port = line.strip()
+  try:
+    if not ser:
+      print "Trying", port
+      ser = serial.Serial(port, timeout=1)
+  except serial.serialutil.SerialException, e:
+    print "Serial port failure: " + str(e)
+port_file.close()
+if not ser:
+  sys.exit(1)
+time.sleep(1)
 line = ser.readline()
 print line.strip()
 while line != "":
+  time.sleep(1)
   line = ser.readline()
   print line.strip()
 
@@ -45,5 +61,6 @@ class ReqHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
     else:
       self.send_response(400)
 
+print "Browse to http://localhost:8000"
 httpd = BaseHTTPServer.HTTPServer(('', 8000), ReqHandler)
 httpd.serve_forever()
