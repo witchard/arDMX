@@ -1,9 +1,13 @@
 #!/usr/bin/python
 
 import serial
-ser = serial.Serial("/dev/ttyACM0", 9600, timeout=1)
+import time
+
+ser = serial.Serial("COM7", 9600, timeout=1)
+time.sleep(1)
 line = ser.readline()
 print line
 while line != "":
+	time.sleep(1)
 	line = ser.readline()
 	print line
