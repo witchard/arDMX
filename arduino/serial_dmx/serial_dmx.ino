@@ -35,8 +35,7 @@ void loop() {
     }
     else if (c=='w') {
       DmxSimple.write(channel, value);
-      //Serial.print("Written value");
-      Serial.println();
+      //Serial.println("Written value");
     }
     value = 0;
   }
