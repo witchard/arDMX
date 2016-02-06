@@ -4,8 +4,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Lighting</title>
     <link rel="stylesheet"  href="css/themes/default/jquery.mobile-1.3.1.min.css">
+    <link rel="stylesheet"  href="css/spectrum.css">
     <script src="js/jquery.js"></script>
     <script src="js/jquery.mobile-1.3.1.min.js"></script>
+    <script src="js/spectrum.js"></script>
 </head>
 <body>
   <div data-role="page" id="main">
@@ -18,8 +20,8 @@
 
         <!-- Quick menu at top of screen -->
         <div data-role="fieldcontain">
-	  <button data-icon="star" class="live" id="set-live" data-inline="true" data-theme="a">Live</button>
-          <button data-icon="star" class="set" id="set-quick" data-inline="true">Set Lights</button>
+	  <button data-icon="star" id="live" data-inline="true" data-theme="b">Live</button>
+          <!--<button data-icon="star" id="set" data-inline="true">Set Lights</button>-->
         </div>
       </p>
     </div>
@@ -28,6 +30,7 @@
       <div class="sliders">
         <!-- Empty space for our sliders -->
       </div>
+      <input type="text" id="spectrum">
     </div>
   </div>
   <div data-role="page" id="dialog">
@@ -38,7 +41,7 @@
     </div>    
   </div>
 
-  <script>
+  <script>    
     function show_dialog(text) {
       $("#dialog-text").html(text);
       $.mobile.changePage( "#dialog", { role: "dialog" } );
@@ -85,7 +88,7 @@
     });
 
     // Handle set lights button click
-    $(".set").bind( "click", function(event, ui) {
+    $("#set").on("click", function(event, ui) {
       // Grab info
       var values = {lights: []};
       $(".slider").each(function() {
@@ -95,16 +98,15 @@
     });
 
     // Handle live flips
-    var live = false;
-    $(".live").on("click", function(event, ui){
+    var live = true;
+    $("#live").on("click", function(event, ui){
       live = !live;
-      console.log(live);
       if( live ) {
-        $(".live").buttonMarkup({theme: 'b'});
-        $(".set").button("disable");
+        $("#live").buttonMarkup({theme: 'b'});
+        $("#set").button("disable");
       } else {
-        $(".live").buttonMarkup({theme: 'a'});
-        $(".set").button("enable");
+        $("#live").buttonMarkup({theme: 'a'});
+        $("#set").button("enable");
       }
     });
 
@@ -140,6 +142,27 @@
       set_lights(values);
     } 
 
+    function doMove(c) {
+      values = {lights: []};
+      values.lights.push([5, Math.round(c._r)]);
+      values.lights.push([6, Math.round(c._g)]);
+      values.lights.push([7, Math.round(c._b)]);
+      set_lights(values);
+    }
+
+    $("#spectrum").spectrum({
+      showPalette: true, preferredFormat: "rgb", showInput: true, move: doMove,
+      palette: [
+        ["#000","#444","#666","#999","#ccc","#eee","#f3f3f3","#fff"],
+        ["#f00","#f90","#ff0","#0f0","#0ff","#00f","#90f","#f0f"],
+        ["#f4cccc","#fce5cd","#fff2cc","#d9ead3","#d0e0e3","#cfe2f3","#d9d2e9","#ead1dc"],
+        ["#ea9999","#f9cb9c","#ffe599","#b6d7a8","#a2c4c9","#9fc5e8","#b4a7d6","#d5a6bd"],
+        ["#e06666","#f6b26b","#ffd966","#93c47d","#76a5af","#6fa8dc","#8e7cc3","#c27ba0"],
+        ["#c00","#e69138","#f1c232","#6aa84f","#45818e","#3d85c6","#674ea7","#a64d79"],
+        ["#900","#b45f06","#bf9000","#38761d","#134f5c","#0b5394","#351c75","#741b47"],
+        ["#600","#783f04","#7f6000","#274e13","#0c343d","#073763","#20124d","#4c1130"]
+    ]});
+    
   </script>
 
 
