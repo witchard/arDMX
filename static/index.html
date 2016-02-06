@@ -9,19 +9,6 @@
 </head>
 <body>
   <div data-role="page" id="main">
-    <div data-role="panel" id="options">
-      <!-- The delay will be implemented in js, but not yet! -->
-      <label for="delay">Light Change Delay (seconds):</label>
-      <input type="range" name="delay" id="slider-delay" value="0" min="0.1" max="5" step=0.1 disabled="disabled" data-highlight="true"/>
-      <label for="flip-live">Update Live:</label>
-      <select name="flip-live" id="flip-live" data-role="slider">
-        <option value="off">Off</option>
-        <option value="on">On</option>
-      </select>
-      <button data-icon="star" class="set" id="set-option">Set Lights</button>
-      <a href="#options" data-role="button" data-icon="delete" data-rel="close">Close</a>
-    </div>
-
     <div data-role="header" data-position="fixed">
       <p>
         <!-- Popup box to show the lights were updated -->
@@ -31,7 +18,7 @@
 
         <!-- Quick menu at top of screen -->
         <div data-role="fieldcontain">
-          <a href="#options" data-role="button" data-inline="true" data-icon="bars">Menu</a>
+	  <button data-icon="star" class="live" id="set-live" data-inline="true" data-theme="a">Live</button>
           <button data-icon="star" class="set" id="set-quick" data-inline="true">Set Lights</button>
         </div>
       </p>
@@ -108,11 +95,15 @@
     });
 
     // Handle live flips
-    $("#flip-live").on("slidestop", function(event, ui){
-      var on = event.currentTarget.selectedIndex;
-      if( on ) {
+    var live = false;
+    $(".live").on("click", function(event, ui){
+      live = !live;
+      console.log(live);
+      if( live ) {
+        $(".live").buttonMarkup({theme: 'b'});
         $(".set").button("disable");
       } else {
+        $(".live").buttonMarkup({theme: 'a'});
         $(".set").button("enable");
       }
     });
@@ -122,7 +113,7 @@
     var slider = null;
     function slider_start(event) {
       // Trigger updates every 100ms
-      if($("#flip-live")[0].selectedIndex) {
+      if(live) {
         slider = event.currentTarget;
         slider_timer = setTimeout(handle_slide, 100);
       }
@@ -136,7 +127,7 @@
 
     function slider_stop(event) {
       // Cancel triggering and update just to make sure we catch last value
-      if($("#flip-live")[0].selectedIndex) {
+      if(live) {
         clearTimeout(slider_timer);
         update_slider(event.currentTarget);
       }

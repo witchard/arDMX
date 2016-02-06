@@ -1,8 +1,7 @@
 [
-  {"channel": 1, "initial": 191, "name": "Red"},
-  {"channel": 2, "initial": 0  , "name": "Green"},
-  {"channel": 3, "initial": 255, "name": "Blue"},
-  {"channel": 4, "initial": 0  , "name": "Amber"},
-  {"channel": 5, "initial": 0  , "name": "White"},
-  {"channel": 6, "initial": 128, "name": "Master"}
+  {"channel": 4, "initial": 0, "name": "Master"},
+  {"channel": 5, "initial": 0, "name": "Red"},
+  {"channel": 6, "initial": 0, "name": "Green"},
+  {"channel": 7, "initial": 0, "name": "Blue"},
+  {"channel": 8, "initial": 0, "name": "White"}
 ]
