@@ -39,7 +39,31 @@ class NullController():
     for (chan, val) in values:
       print( str(chan) + ' => ' + str(val) )
 
-ctrl = ArduinoController()
+class uDMXController():
+  def __init__(self):
+    import usb
+    dev = usb.core.find(idVendor=0x16c0, idProduct = 0x05dc)
+    if dev != None and (dev.manufacturer != 'www.anyma.ch' or dev.product != 'uDMX'):
+      dev = None
+    if not dev:
+      print("Could not find device")
+      sys.exit(1)
+    self.dev = dev
+    self.reqType = usb.util.CTRL_TYPE_VENDOR | usb.util.CTRL_RECIPIENT_DEVICE | usb.util.ENDPOINT_OUT
+
+  def write_one(self, channel, value):
+    # request 1 means set single channel, wValue = value, wIndex = channel, wLength is ignored
+    return self.dev.ctrl_transfer(self.reqType, 1, value, channel) == 0
+
+  def write_many(self, start_channel, values):
+    # request 2 means set multiple channels, wValue = number of values, wIndex = starting channel
+    return self.dev.ctrl_transfer(self.reqType, 2, len(values), start_channel, values) == len(values)
+
+  def __call__(self, values):
+    for (chan, val) in values:
+      self.write_one(chan, val)
+
+ctrl = uDMXController()
 
 @route('/')
 def index():
