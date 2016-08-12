@@ -29,16 +29,20 @@ class ArduinoController():
       print(line.strip())
     self.ser = ser
 
-  def __call__(self, values):
+  def __call__(self, base, values):
     cmd = ""
-    for (chan, val) in values:
-      cmd += "%sc%sw" % (chan, val)
+    b = int(base)
+    for v in values:
+      cmd += "%sc%sw" % (b, v)
+      b += 1
     self.ser.write(str.encode(cmd))
 
 class NullController():
-  def __call__(self, values):
-    for (chan, val) in values:
-      print( str(chan) + ' => ' + str(val) )
+  def __call__(self, base, values):
+    b = int(base)
+    for v in values:
+      print( str(b) + ' => ' + str(v) )
+      b += 1
 
 class uDMXController():
   def __init__(self):
@@ -54,15 +58,15 @@ class uDMXController():
 
   def write_one(self, channel, value):
     # request 1 means set single channel, wValue = value, wIndex = channel, wLength is ignored
-    return self.dev.ctrl_transfer(self.reqType, 1, value, channel) == 0
+    return self.dev.ctrl_transfer(self.reqType, 1, value, channel-1) == 0
 
   def write_many(self, start_channel, values):
     # request 2 means set multiple channels, wValue = number of values, wIndex = starting channel
     return self.dev.ctrl_transfer(self.reqType, 2, len(values), start_channel, values) == len(values)
 
-  def __call__(self, values):
-    for (chan, val) in values:
-      self.write_one(chan, val)
+  def __call__(self, base, values):
+    v = bytes( [int(x) for x in values] )
+    self.write_many(int(base)-1, v) # uDMX is 0 indexed
 
 
 if __name__ == "__main__":
@@ -77,7 +81,8 @@ if __name__ == "__main__":
     ctrl = ArduinoController()
 
   if 'static' in c:
-    ctrl(c['static'].items())
+    for k, v in c['static'].items():
+      ctrl(k, [v])
 
   template_info = []
   for sec in filter(lambda x: x.startswith('fixture-'), c.keys()):
@@ -96,12 +101,9 @@ if __name__ == "__main__":
 
   @post('/set_values')
   def set():
-    vals = []
+    vals = [request.json[x] for x in ['r', 'g', 'b']]
     base = int(c[request.json['id']]['base'])
-    for col in ['r','g','b']:
-      vals.append( (base, request.json[col]) )
-      base += 1
-    ctrl(vals)
+    ctrl(base, vals)
     return {'ok': True}
 
   print("Browse to http://localhost:8000")
