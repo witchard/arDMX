@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
-from bottle import post, route, run, static_file, request
+from bottle import post, route, run, static_file, request, SimpleTemplate
 import sys
 import time
+import configparser
 
 class ArduinoController():
   def __init__(self):
@@ -30,7 +31,7 @@ class ArduinoController():
 
   def __call__(self, values):
     cmd = ""
-    for (chan, val) in req["lights"]:
+    for (chan, val) in values:
       cmd += "%sc%sw" % (chan, val)
     self.ser.write(str.encode(cmd))
 
@@ -63,25 +64,46 @@ class uDMXController():
     for (chan, val) in values:
       self.write_one(chan, val)
 
-ctrl = uDMXController()
 
-@route('/')
-def index():
-  return static_file('index.html', root="static")
-  
-@route('/<filename:path>')
-def serve_static(filename):
-  return static_file(filename, root="static")
+if __name__ == "__main__":
+  # Setup
+  c = configparser.ConfigParser()
+  c.read('config.ini')
 
-@post('/set_values')
-def set():
-  req = request.json
-      
-  ctrl(req['lights'])
+  ctrl = NullController()
+  if c['settings']['controller'] == 'uDMX':
+    ctrl = uDMXController()
+  elif c['settings']['controller'] == 'Arduino':
+    ctrl = ArduinoController()
 
-  # Send back OK
-  return {'ok': True}
+  if 'static' in c:
+    ctrl(c['static'].items())
 
-print("Browse to http://localhost:8000")
-run(host='localhost', port=8000)
+  template_info = []
+  for sec in filter(lambda x: x.startswith('fixture-'), c.keys()):
+    template_info.append({'title': c[sec]['name'], 'id': sec})
+
+  indexTemplate = SimpleTemplate(open('index.tpl.html', 'r')).render(fixtures=template_info)
+
+  # Webserver
+  @route('/')
+  def index():
+    return indexTemplate
+    
+  @route('/<filename:path>')
+  def serve_static(filename):
+    return static_file(filename, root="static")
+
+  @post('/set_values')
+  def set():
+    vals = []
+    base = int(c[request.json['id']]['base'])
+    for col in ['r','g','b']:
+      vals.append( (base, request.json[col]) )
+      base += 1
+    ctrl(vals)
+    return {'ok': True}
+
+  print("Browse to http://localhost:8000")
+  run(host='localhost', port=8000)
 
