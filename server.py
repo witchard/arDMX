@@ -106,6 +106,14 @@ if __name__ == "__main__":
     ctrl(base, vals)
     return {'ok': True}
 
-  print("Browse to http://localhost:8000")
-  run(host='localhost', port=8000)
+  url = 'http://' + c['settings']['host'] + ':' + c['settings']['port']
+
+  if c['settings'].getboolean('launch_browser'):
+    print('Launching browser at ' + url)
+    import webbrowser
+    webbrowser.open(url)
+  else:
+    print("Browse to http://localhost:8000")
+
+  run(host=c['settings']['host'], port=int(c['settings']['port']))
 
