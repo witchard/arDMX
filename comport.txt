@@ -1,3 +1,7 @@
 /dev/ttyACM0
 COM7
 /dev/cu.usbmodem1471
+/dev/cu.usbmodem1461
+/dev/cu.usbmodem11
+/dev/cu.usbmodem12
+/dev/cu.usbmodem22
