@@ -25,9 +25,8 @@
       return left_colour + $("#fade").val() * step;
     }
 
-    function doMove(c) {
+    function doMove(mainId) {
       // Compute values
-      mainId = this.id.replace(/-\d$/, '');
       left = $("#" + mainId + "-1").spectrum("get");
       right = $("#" + mainId + "-2").spectrum("get");
 
@@ -58,9 +57,14 @@
         });
     }
 
+    function pickerCallback(c) {
+      mainId = this.id.replace(/-\d$/, '');
+      doMove(mainId);
+    }
+
     function setupPicker(id) {
       $(id).spectrum({
-        showPalette: true, preferredFormat: "rgb", showInput: true, move: doMove,
+        showPalette: true, preferredFormat: "rgb", showInput: true, move: pickerCallback,
         palette: [
           ["#000","#444","#666","#999","#ccc","#eee","#f3f3f3","#fff"],
           ["#f00","#f90","#ff0","#0f0","#0ff","#00f","#90f","#f0f"],
@@ -77,6 +81,15 @@
       setupPicker("#{{item['id']}}-1")
       setupPicker("#{{item['id']}}-2")
     % end
+    lastFade = 0;
+    $("#fade").on("change mousemove", function() {
+      if( $(this).val() != lastFade ) {
+        lastFade = $(this).val();
+        % for item in fixtures:
+        doMove("{{item['id']}}");
+        % end
+      }
+    });
   </script>
 
 
