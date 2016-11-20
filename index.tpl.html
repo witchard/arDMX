@@ -8,18 +8,38 @@
     <script src="js/spectrum.js"></script>
 </head>
 <body>
+  <h2>Fade between the two selected colours</h2>
+  <!-- TODO this could be the name of a lighting group -->
+  <input type="range" id="fade" min="0" max="100" value=0>
+
   % for item in fixtures:
   <h2>{{item['title']}}</h2>
-  <input type="text" id="{{item['id']}}">
+  <div id="{{item['id']}}-result" style="display: inline-block; padding: 10px; background-color: rgb(0,0,0); border-style: solid; border-width: 1px;">
+  <input type="text" id="{{item['id']}}-1">
+  <input type="text" id="{{item['id']}}-2">
+  </div>
   % end
-  <script>    
+  <script>
+    function computeFaded(left_colour, right_colour) {
+      step = (right_colour - left_colour) / 100;
+      return left_colour + $("#fade").val() * step;
+    }
+
     function doMove(c) {
+      // Compute values
+      mainId = this.id.replace(/-\d$/, '');
+      left = $("#" + mainId + "-1").spectrum("get");
+      right = $("#" + mainId + "-2").spectrum("get");
+
       // Build structure
       values = {
-        id: this.id, 
-        r: Math.round(c._r),
-        g: Math.round(c._g),
-        b: Math.round(c._b)};
+        id: mainId,
+        r: Math.round( computeFaded(left._r, right._r) ),
+        g: Math.round( computeFaded(left._g, right._g) ),
+        b: Math.round( computeFaded(left._b, right._b) )
+        };
+      col = "rgb(" + values["r"] + "," + values["g"] + "," + values["b"] + ")";
+      $("#" + mainId + "-result").css("background-color", col);
       
       // Send values as json blob
       $.ajax({
@@ -38,19 +58,24 @@
         });
     }
 
+    function setupPicker(id) {
+      $(id).spectrum({
+        showPalette: true, preferredFormat: "rgb", showInput: true, move: doMove,
+        palette: [
+          ["#000","#444","#666","#999","#ccc","#eee","#f3f3f3","#fff"],
+          ["#f00","#f90","#ff0","#0f0","#0ff","#00f","#90f","#f0f"],
+          ["#f4cccc","#fce5cd","#fff2cc","#d9ead3","#d0e0e3","#cfe2f3","#d9d2e9","#ead1dc"],
+          ["#ea9999","#f9cb9c","#ffe599","#b6d7a8","#a2c4c9","#9fc5e8","#b4a7d6","#d5a6bd"],
+          ["#e06666","#f6b26b","#ffd966","#93c47d","#76a5af","#6fa8dc","#8e7cc3","#c27ba0"],
+          ["#c00","#e69138","#f1c232","#6aa84f","#45818e","#3d85c6","#674ea7","#a64d79"],
+          ["#900","#b45f06","#bf9000","#38761d","#134f5c","#0b5394","#351c75","#741b47"],
+          ["#600","#783f04","#7f6000","#274e13","#0c343d","#073763","#20124d","#4c1130"]
+      ]});
+    }
+
     % for item in fixtures:
-    $("#{{item['id']}}").spectrum({
-      showPalette: true, preferredFormat: "rgb", showInput: true, move: doMove,
-      palette: [
-        ["#000","#444","#666","#999","#ccc","#eee","#f3f3f3","#fff"],
-        ["#f00","#f90","#ff0","#0f0","#0ff","#00f","#90f","#f0f"],
-        ["#f4cccc","#fce5cd","#fff2cc","#d9ead3","#d0e0e3","#cfe2f3","#d9d2e9","#ead1dc"],
-        ["#ea9999","#f9cb9c","#ffe599","#b6d7a8","#a2c4c9","#9fc5e8","#b4a7d6","#d5a6bd"],
-        ["#e06666","#f6b26b","#ffd966","#93c47d","#76a5af","#6fa8dc","#8e7cc3","#c27ba0"],
-        ["#c00","#e69138","#f1c232","#6aa84f","#45818e","#3d85c6","#674ea7","#a64d79"],
-        ["#900","#b45f06","#bf9000","#38761d","#134f5c","#0b5394","#351c75","#741b47"],
-        ["#600","#783f04","#7f6000","#274e13","#0c343d","#073763","#20124d","#4c1130"]
-    ]});
+      setupPicker("#{{item['id']}}-1")
+      setupPicker("#{{item['id']}}-2")
     % end
   </script>
 
