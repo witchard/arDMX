@@ -8,8 +8,8 @@
     <script src="js/spectrum.js"></script>
 </head>
 <body>
+
   <h2>Fade between the two selected colours</h2>
-  <!-- TODO this could be the name of a lighting group -->
   <input type="range" id="fade" min="0" max="100" value=0>
 
   % for item in fixtures:
@@ -19,6 +19,7 @@
   <input type="text" id="{{item['id']}}-2">
   </div>
   % end
+
   <script>
     function computeFaded(left_colour, right_colour) {
       step = (right_colour - left_colour) / 100;
