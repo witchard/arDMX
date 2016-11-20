@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+
 from bottle import post, route, run, static_file, request, SimpleTemplate
 import sys
 import time
@@ -115,5 +116,9 @@ if __name__ == "__main__":
   else:
     print("Browse to http://localhost:8000")
 
-  run(host=c['settings']['host'], port=int(c['settings']['port']))
+  if c['settings'].getboolean('debug'):
+    debug = True
+  else:
+    debug = False
+  run(host=c['settings']['host'], port=int(c['settings']['port']), debug=debug)
 
